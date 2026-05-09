@@ -8,22 +8,63 @@ const EmployeeComponent = () => {
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
 
+    const [errors, setErrors] =useState({
+        firstName: '',
+        lastName:'',
+        email:''
+    })
+
     const navigator = useNavigate();
 
     const saveEmployee = (e) => {
         e.preventDefault();
-        const employee = {firstName, lastName, email}
-        console.log(employee)
 
-        createEmployee(employee).then((response) =>{
-            console.log(response.data);
-            navigator('/employees');
-        })
-    }
+        if(validateForm()){
+            const employee = {firstName, lastName, email}
+            console.log(employee)
 
-    function cancel(){
+            createEmployee(employee).then((response) =>{
+                console.log(response.data);
+                navigator('/employees');
+            })
+        }
         
     }
+
+    function validateForm(){
+        let valid = true;
+
+        const errorsCopy = {... errors}
+
+        if(firstName.trim()){
+            errorsCopy.firstName= '';
+        } else {
+            errorsCopy.firstName= "first name is required";
+            valid = false;
+        }
+
+        if(lastName.trim()){
+            errorsCopy.lastName= '';
+        } else {
+            errorsCopy.lastName= "last name is required";
+            valid = false;
+        }
+
+        if(email.trim()){
+            errorsCopy.email= "";
+        } else {
+            errorsCopy.email= "email is required";
+            valid = false;
+        }
+
+        setErrors(errorsCopy);
+
+        return valid;
+    }
+
+    
+
+    
   return (
     
     <div className='container'>
@@ -42,8 +83,10 @@ const EmployeeComponent = () => {
                                 value={firstName}
                                 onChange={(e) => {
                                     setFirstName(e.target.value)}}
-                                className='form-control'
+                                className={`form-control ${ errors.firstName ? 'is-invalid':''}`}
                              />
+
+                             { errors.firstName && <div className='invalid-feedback'>{errors.firstName}</div>}
                         </div>
 
                         <div className='form-group mb-2'>
@@ -54,8 +97,10 @@ const EmployeeComponent = () => {
                                 name='lastName'
                                 value={lastName}
                                 onChange={ (e) => {setLastName(e.target.value)}}
-                                className='form-control'
+                                className={`form-control ${ errors.lastName ? 'is-invalid':''}`}
                              />
+
+                             { errors.lastName && <div className='invalid-feedback'>{errors.lastName}</div>}
                         </div>
 
                         <div className='form-group mb-2'>
@@ -66,12 +111,13 @@ const EmployeeComponent = () => {
                                 name='email'
                                 value={email}
                                 onChange={(e) => {setEmail(e.target.value)}}
-                                className='form-control'
+                                className={`form-control ${ errors.email ? 'is-invalid':''}`}
                              />
+
+                             { errors.email && <div className='invalid-feedback'>{errors.email}</div>}
                         </div> 
 
                         <button className='btn btn-success' onClick={saveEmployee}>Submit</button>
-                        <button className='btn btn-danger' onClick={cancel}>Cancel</button>
                     </form>
                 </div>
             </div> 
