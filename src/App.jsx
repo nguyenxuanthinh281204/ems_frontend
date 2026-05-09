@@ -1,29 +1,50 @@
-import "./App.css";
-import ListEmployeeComponent from "./component/ListEmployeeComponent";
-import HeaderComponent from "./component/HeaderComponent";
-import FooterComponent from "./component/FooterComponent";
-import EmployeeComponent from "./component/EmployeeComponent";
-import { BrowserRouter, Route, Routes }  from "react-router-dom";
+import './index.css';
+import './App.css';
+import { useState, useCallback } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import SidebarComponent from './component/SidebarComponent';
+import HeaderComponent from './component/HeaderComponent';
+import FooterComponent from './component/FooterComponent';
+import ListEmployeeComponent from './component/ListEmployeeComponent';
+import EmployeeComponent from './component/EmployeeComponent';
+import ToastNotification from './component/ToastNotification';
+
 function App() {
+  const [toasts, setToasts] = useState([]);
+
+  const addToast = useCallback((message, type = 'success') => {
+    const id = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id, message, type }]);
+  }, []);
+
+  const removeToast = useCallback((id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
   return (
-    <>
     <BrowserRouter>
-      <HeaderComponent />
-        <Routes>
-        {/* // http://localhost:3000 */}
-          <Route path="/" element={<ListEmployeeComponent />}></Route>
-          {/* // http://localhost:3000/employees */}
-          <Route path="/employees" element={<ListEmployeeComponent />}></Route>
-          {/* // http://localhost:3000/add-employee */}
-          <Route path="/add-employee" element={<EmployeeComponent />}></Route>
-          {/* // http://localhost:3000/edit-employee/:id */}
-          <Route path="/edit-employee/:id" element={<EmployeeComponent />}></Route>
-          
-          
-        </Routes>        
-      <FooterComponent />
+      <div className="ems-layout">
+        {/* Sidebar */}
+        <SidebarComponent />
+
+        {/* Main area */}
+        <div className="ems-main">
+          <HeaderComponent />
+
+          <Routes>
+            <Route path="/"               element={<ListEmployeeComponent addToast={addToast} />} />
+            <Route path="/employees"      element={<ListEmployeeComponent addToast={addToast} />} />
+            <Route path="/add-employee"   element={<EmployeeComponent     addToast={addToast} />} />
+            <Route path="/edit-employee/:id" element={<EmployeeComponent  addToast={addToast} />} />
+          </Routes>
+
+          <FooterComponent />
+        </div>
+
+        {/* Global Toasts */}
+        <ToastNotification toasts={toasts} removeToast={removeToast} />
+      </div>
     </BrowserRouter>
-    </>
   );
 }
 
